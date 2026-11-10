@@ -1,0 +1,720 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TomoWISE — Beamline in Motion V3.1</title><style>
+*{box-sizing:border-box}body{margin:0;background:#f4f7f3;color:#175237;font:15px/1.5 Arial,sans-serif}main{max-width:1800px;margin:auto;padding:28px 24px}header{display:flex;justify-content:space-between;align-items:baseline;gap:16px}h1{font-size:23px;margin:0}header p{font-size:12px;letter-spacing:.06em;margin:0}.card{background:white;border:1px solid #dbe6dc;border-radius:16px;margin:22px 0;padding:12px 16px 22px;overflow:hidden}.hud-row{height:114px;position:relative}.hud{position:absolute;width:174px;height:104px;opacity:0;transform-origin:50% 100%;pointer-events:none}.hud svg{width:100%;height:100%;display:block}.scan{right:3%}.analysis{left:41%}.art>svg{display:block;width:100%;height:auto}.controls{display:flex;align-items:center;gap:10px}button{width:42px;height:42px;border:1px solid #b8cebe;border-radius:50%;background:white;color:#176b45;display:grid;place-items:center;cursor:pointer}button:hover{background:#edf5ec}button:focus-visible,input:focus-visible{outline:3px solid #d889a6;outline-offset:3px}button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}input{flex:1;min-width:50px;accent-color:#b84675}output{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}#stage{font-size:20px;margin:20px 0 4px}#detail{min-height:38px;font-size:13px;color:#55715e;margin:0}.timeline{display:grid;grid-template-columns:3.5fr 3fr 1.5fr 1fr 1fr;gap:7px;margin:18px 0}.timeline div{border-top:3px solid #d6e3d7;padding-top:8px;font-size:12px}.timeline .current{border-color:#cc678f;color:#98385f}.note{font-size:12px;color:#617767;max-width:1000px}.tag{display:inline-block;border:1px solid #d6e3d7;border-radius:20px;padding:3px 10px;font-size:11px;letter-spacing:.05em}.sound-on{background:#e8f4e6;border-color:#176b45}.fx-complete{filter:drop-shadow(0 0 2px #9bbf91)}@media(max-width:600px){main{padding:18px 10px}header{display:block}h1{font-size:19px}header p{margin-top:6px}.card{padding:8px 4px 14px;margin:16px 0}.hud-row{height:100px}.hud{width:145px;height:90px}.analysis{left:29%}.scan{right:1%}.controls{gap:7px;flex-wrap:wrap}button{width:40px;height:40px}output{flex-basis:100%;text-align:right}#stage{font-size:17px}#detail{min-height:58px}.timeline{gap:4px}.timeline div{font-size:10px}.note{font-size:11px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+#play{background:#d889a6;border-color:#d889a6;color:white}#play:hover{background:#c87998}button{border-color:transparent;background:transparent}button:hover{background:#edf1ec}#sound.sound-on{background:#edf3eb;border-color:transparent}header p{letter-spacing:.02em;text-transform:none;font-size:14px;color:#6a7f70}.controls{max-width:1050px;margin:0 auto}.disclaimer{font-size:12px;color:#6a7b6e;text-align:center;max-width:900px;margin:18px auto 0}.hud-row{height:126px}.hud{width:212px;height:118px}.art>svg{overflow:visible}.analysis{left:40%}input[type=range]{appearance:none;-webkit-appearance:none;height:4px;border-radius:8px;background:linear-gradient(to right,#9da39f 0%,#9da39f var(--progress,0%),#e4e7e4 var(--progress,0%),#e4e7e4 100%);accent-color:#969e98;cursor:pointer}input[type=range]::-webkit-slider-thumb{appearance:none;width:11px;height:11px;background:#909a92;border:2px solid white;box-shadow:0 0 0 1px #c6cec7;border-radius:50%}input[type=range]::-moz-range-thumb{width:8px;height:8px;background:#909a92;border:2px solid white;border-radius:50%}input[type=range]::-moz-range-track{background:transparent}#time{color:#6b7b70}.card{margin-bottom:16px}@media(max-width:600px){header p{font-size:12px}.hud-row{height:108px}.hud{width:174px;height:100px}.analysis{left:27%}.disclaimer{font-size:11px;margin-top:14px}}
+
+.art>svg:not([data-ready]) :is(.cls-6,.cls-5,.cls-31,.cls-32,.cls-33,.cls-34,.cls-35){opacity:0}
+
+/* WebAR integration only: readable single sound control and compact mobile framing. */
+#sound{width:auto;min-width:112px;display:flex;align-items:center;gap:7px;border-radius:24px;padding:0 12px}#sound span{font-size:12px;white-space:nowrap}body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}main{min-height:100dvh} @media(orientation:landscape) and (max-height:600px){main{padding:10px 14px}header h1{font-size:17px}header p{font-size:10px}.card{margin:8px 0;padding-top:2px;padding-bottom:10px}.hud-row{height:90px}.hud{height:86px;width:160px}.disclaimer{margin:8px auto 0;font-size:10px}}
+</style></head><body><main><header><h1>TomoWISE — Beamline in Motion</h1><p>Interactive Beamline Demonstration</p></header><section class="card" aria-label="Animated beamline schematic"><div class="hud-row"><div class="hud scan" id="scanHUD"><svg viewBox="0 0 212 118" aria-label="Illustrative tomography scanning preview"><rect x="1" y="1" width="210" height="116" rx="13" fill="#fbfdf9" stroke="#d889a6"/><text x="12" y="17" font-family="Arial" font-size="9" fill="#176b45">11 / PROJECTION SCAN</text><g id="sample" transform="translate(42 56)"><ellipse rx="14" ry="22" fill="#d9efcf" stroke="#176b45"/><path d="M-10 -15 Q11 0 -10 15 M0 -21 Q21 0 0 21" fill="none" stroke="#71ac66"/></g><line id="scanLine" x1="19" x2="65" y1="35" y2="35" stroke="#d05c8d" stroke-width="1.5"/><g id="projections" stroke="#7ba477" stroke-width="3" stroke-linecap="round"><path d="M83 65v-10"/><path d="M90 65v-17"/><path d="M97 65v-24"/><path d="M104 65v-31"/><path d="M111 65v-12"/><path d="M118 65v-19"/><path d="M125 65v-26"/><path d="M132 65v-33"/></g><g id="slices" stroke="#176b45" fill="#d9efcf"><ellipse cx="171" cy="48" rx="21" ry="7"/><ellipse cx="171" cy="58" rx="21" ry="7"/><ellipse cx="171" cy="68" rx="21" ry="7"/></g><g id="scanRecon" fill="#e3f0da" stroke="#176b45"><circle cx="171" cy="58" r="23"/><path d="M155 55q5-15 13-7t16-2q9 18-4 22t-15-4q-12 2-10-9Z" fill="#edd2df" stroke="#c27a9a"/></g><circle id="scanDot" cx="196" cy="17" r="2" fill="#d05c8d"/><text id="scanCaption" x="12" y="100" font-size="8" font-family="Arial" fill="#64816a">PROJECTIONS</text></svg></div><div class="hud analysis" id="analysisHUD"><svg viewBox="0 0 174 104" aria-label="Illustrative reconstructed tomography slices"><rect x="1" y="1" width="172" height="102" rx="13" fill="#fbfdf9" stroke="#d889a6"/><text x="12" y="17" font-family="Arial" font-size="9" fill="#176b45">12 / RECONSTRUCTION</text><g id="recon" stroke="#176b45" fill="#d9efcf"><ellipse cx="59" cy="57" rx="26" ry="26"/><ellipse cx="77" cy="57" rx="26" ry="26"/><ellipse cx="95" cy="57" rx="26" ry="26"/><ellipse cx="113" cy="57" rx="26" ry="26"/><circle cx="113" cy="57" r="12" fill="#f6e0e9"/></g><text x="12" y="95" font-size="8" font-family="Arial" fill="#64816a">Illustrative reconstruction</text></svg></div></div><div class="art"><svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1675.24 387.26">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f3f6f2;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4, .cls-5, .cls-6, .cls-7 {
+        stroke-miterlimit: 5.3;
+      }
+
+      .cls-1, .cls-8, .cls-9, .cls-10, .cls-11, .cls-12, .cls-3, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-4, .cls-19, .cls-20, .cls-21, .cls-22, .cls-23, .cls-24, .cls-25, .cls-26, .cls-27, .cls-28, .cls-29, .cls-30 {
+        stroke: #176b45;
+      }
+
+      .cls-1, .cls-7 {
+        stroke-width: 2px;
+      }
+
+      .cls-2 {
+        stroke: #50745e;
+        stroke-width: 5.3px;
+      }
+
+      .cls-2, .cls-8, .cls-9, .cls-10, .cls-11, .cls-31, .cls-32, .cls-12, .cls-33, .cls-34, .cls-3, .cls-18, .cls-4, .cls-5, .cls-6, .cls-35, .cls-27, .cls-28, .cls-7 {
+        fill: none;
+      }
+
+      .cls-8, .cls-9, .cls-10, .cls-11, .cls-31, .cls-32, .cls-12, .cls-33, .cls-34, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-18, .cls-19, .cls-20, .cls-35, .cls-21, .cls-22, .cls-23, .cls-24, .cls-25, .cls-26, .cls-27, .cls-28, .cls-29, .cls-30 {
+        stroke-linejoin: round;
+      }
+
+      .cls-8, .cls-9, .cls-10, .cls-11, .cls-31, .cls-32, .cls-12, .cls-33, .cls-34, .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-19, .cls-20, .cls-35, .cls-21, .cls-22, .cls-23, .cls-24, .cls-25, .cls-26, .cls-27, .cls-28, .cls-29, .cls-30 {
+        stroke-linecap: round;
+      }
+
+      .cls-8, .cls-34, .cls-14, .cls-29 {
+        stroke-width: 3px;
+      }
+
+      .cls-9, .cls-31, .cls-16, .cls-24 {
+        stroke-width: 3.9px;
+      }
+
+      .cls-10, .cls-32, .cls-25 {
+        stroke-width: 2.8px;
+      }
+
+      .cls-11, .cls-15, .cls-23 {
+        stroke-width: 4.2px;
+      }
+
+      .cls-31, .cls-32, .cls-33, .cls-34, .cls-5, .cls-6, .cls-35 {
+        stroke: #d889a6;
+      }
+
+      .cls-12, .cls-17, .cls-6, .cls-26 {
+        stroke-width: 3.7px;
+      }
+
+      .cls-33, .cls-13, .cls-30 {
+        stroke-width: 3.2px;
+      }
+
+      .cls-3 {
+        stroke-width: 2.4px;
+      }
+
+      .cls-36 {
+        font-size: 11.68px;
+      }
+
+      .cls-36, .cls-37, .cls-38, .cls-39, .cls-40, .cls-41, .cls-42, .cls-43, .cls-44 {
+        isolation: isolate;
+      }
+
+      .cls-36, .cls-37, .cls-38, .cls-40, .cls-41, .cls-42, .cls-44 {
+        font-family: ArialMT, Arial;
+      }
+
+      .cls-36, .cls-37, .cls-38, .cls-40, .cls-41, .cls-45, .cls-43, .cls-44 {
+        fill: #176b45;
+      }
+
+      .cls-13, .cls-14, .cls-15, .cls-16, .cls-17, .cls-19, .cls-20 {
+        fill: #7ed957;
+      }
+
+      .cls-37 {
+        font-size: 10.62px;
+      }
+
+      .cls-18 {
+        stroke-width: 6.9px;
+      }
+
+      .cls-4 {
+        stroke-dasharray: 6.7 8;
+        stroke-width: 2.1px;
+      }
+
+      .cls-38 {
+        font-size: 12.74px;
+      }
+
+      .cls-19, .cls-21, .cls-28 {
+        stroke-width: 1.7px;
+      }
+
+      .cls-20, .cls-35, .cls-22, .cls-27 {
+        stroke-width: 1.8px;
+      }
+
+      .cls-5 {
+        stroke-width: 2.9px;
+      }
+
+      .cls-21, .cls-22, .cls-23, .cls-24, .cls-25, .cls-26, .cls-29, .cls-30 {
+        fill: #fff;
+      }
+
+      .cls-46 {
+        letter-spacing: 0em;
+      }
+
+      .cls-47 {
+        fill: rgba(234, 244, 232, .8);
+      }
+
+      .cls-40 {
+        font-size: 14.87px;
+      }
+
+      .cls-48 {
+        letter-spacing: 0em;
+      }
+
+      .cls-41 {
+        font-size: 13.54px;
+      }
+
+      .cls-49 {
+        fill: rgba(234, 244, 232, .9);
+      }
+
+      .cls-50 {
+        letter-spacing: 0em;
+      }
+
+      .cls-51 {
+        letter-spacing: 0em;
+      }
+
+      .cls-52 {
+        letter-spacing: 0em;
+      }
+
+      .cls-7 {
+        stroke: #bdcec0;
+        stroke-dasharray: 6.7 9.3;
+      }
+
+      .cls-42 {
+        fill: #34443c;
+        font-size: 11.31px;
+      }
+
+      .cls-53 {
+        letter-spacing: -.07em;
+      }
+
+      .cls-54 {
+        letter-spacing: -.07em;
+      }
+
+      .cls-55 {
+        letter-spacing: -.07em;
+      }
+
+      .cls-56 {
+        letter-spacing: -.07em;
+      }
+
+      .cls-57 {
+        letter-spacing: -.09em;
+      }
+
+      .cls-58 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-59 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-60 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-61 {
+        letter-spacing: -.06em;
+      }
+
+      .cls-62 {
+        letter-spacing: -.04em;
+      }
+
+      .cls-43 {
+        font-family: Arial-BoldMT, Arial;
+        font-size: 17.31px;
+        font-weight: 700;
+      }
+
+      .cls-63 {
+        fill: #d889a6;
+      }
+
+      .cls-44 {
+        font-size: 15.56px;
+      }
+    </style>
+  </defs>
+  <g id="Section_x5F_Title">
+    <g class="cls-39">
+      <text class="cls-43" transform="translate(0 14.85)"><tspan x="0" y="0" xml:space="preserve">01  BEAMLINE L</tspan><tspan class="cls-57" x="134.66" y="0">A</tspan><tspan class="cls-48" x="145.57" y="0">YOUT</tspan></text>
+    </g>
+  </g>
+  <g id="Schematic_x5F_Notice">
+    <g class="cls-39">
+      <text class="cls-41" transform="translate(1481.81 14.85)"><tspan x="0" y="0">Schematic layout — not to scale</tspan></text>
+    </g>
+  </g>
+  <g id="Beamline_x5F_Structure">
+    <rect class="cls-1" x="33.72" y="124.72" width="417.38" height="198.07"/>
+    <g id="hutch-fills">
+      <path class="cls-47" d="M465.28,124.72h367.89v215.75l-367.89-17.68V124.72h0Z"/>
+      <path class="cls-49" d="M833.17,124.72h714.54l42.43,28.3v169.77h-756.97V124.72h0Z"/>
+    </g>
+    <path class="cls-18" d="M33.72,124.72h417.38v198.07H33.72V124.72h0ZM465.28,124.72h1082.43l42.43,28.3v169.77h-756.97v17.68l-367.89-17.68V124.72h0ZM833.17,124.72v215.75"/>
+    <path class="cls-2" d="M656.29,124.72v-41.05l84.91-43.86,120.28,28.3v14.13h134.4l198.07,42.43M741.2,39.86v84.91M861.47,82.29v15.56M861.47,114.1v10.62M995.88,82.29v42.43"/>
+    <path class="cls-3" d="M918.08,34.87v59.42M914.52,88.66l3.56,5.68,3.56-5.68"/>
+    <path class="cls-7" d="M302.58,162.21v148.58"/>
+    <path class="cls-7" d="M1080.79,162.21v148.58"/>
+    <path class="cls-6" d="M61.33,206.07h1466.73"/>
+    <path class="cls-5" d="M289.14,201.82l6.37,4.25-6.37,4.25"/>
+    <path class="cls-5" d="M451.85,201.82l6.37,4.25-6.37,4.25"/>
+    <path class="cls-5" d="M685.28,201.82l6.37,4.25-6.37,4.25"/>
+    <path class="cls-5" d="M1003.68,201.82l6.37,4.25-6.37,4.25"/>
+    <path class="cls-5" d="M1208.82,201.82l6.37,4.25-6.37,4.25"/>
+    <path class="cls-5" d="M1385.7,201.82l6.37,4.25-6.37,4.25"/>
+    <path class="cls-4" d="M1590.14,237.93h21.24c53.05,0,53.05-174.02-42.43-174.02h-429.44c-29.74,0-54,6.11-72.86,18.37l-84.91,14.13"/>
+    <path class="cls-3" d="M987.38,92.17l-5.68,4.25,7.06,2.81"/>
+  </g>
+  <g id="Beamline_x5F_Components">
+    <g id="Beamline_x5F_Component_x5F_01_x5F_Undulator_x5F_CPMU">
+      <g id="Icon_x5F_02_x5F_3_x5F_Pole_x5F_Wiggler">
+        <path class="cls-34" d="M200.09,208.2h11.84M265.62,204.8l16.89-6.74M265.62,207.77l19.01-.42M266.04,210.32l16.89,5.52"/>
+        <path class="cls-29" d="M214.48,220.89c-2.55,0-3.82-1.43-3.82-4.25v-17.74c0-1.12.58-2.12,1.7-2.97l5.1-4.25h10.57c1.7,0,2.55,1.01,2.55,2.97v21.13c0,1.12-.58,2.12-1.7,2.97l-2.97,2.12h-11.42Z"/>
+        <path class="cls-8" d="M211.51,197.63h11.84l5.52-5.52M223.35,197.63v19.44c0,1.96.85,3.24,2.55,3.82"/>
+        <path class="cls-14" d="M223.35,198.48l5.52-5.52v23.26l-2.97,3.4c-1.7,0-2.55-.85-2.55-2.55v-18.59h0Z"/>
+        <path class="cls-29" d="M234.34,220.89c-2.55,0-3.82-1.43-3.82-4.25v-17.74c0-1.12.58-2.12,1.7-2.97l5.1-4.25h10.14c1.7,0,2.55,1.01,2.55,2.97v21.13c0,1.12-.58,2.12-1.7,2.97l-2.97,2.12h-10.99,0Z"/>
+        <path class="cls-8" d="M231.37,197.63h11.42l5.52-5.52M242.78,197.63v19.44c0,1.96.85,3.24,2.55,3.82"/>
+        <path class="cls-14" d="M242.78,198.48l5.52-5.52v23.26l-2.97,3.4c-1.7,0-2.55-.85-2.55-2.55v-18.59h0Z"/>
+        <path class="cls-29" d="M253.78,220.89c-2.55,0-3.82-1.43-3.82-4.25v-17.74c0-1.12.58-2.12,1.7-2.97l5.1-4.25h7.17c1.7,0,2.55,1.01,2.55,2.97v21.13c0,1.12-.58,2.12-1.7,2.97l-2.97,2.12h-8.02Z"/>
+        <path class="cls-8" d="M250.8,197.63h8.44l5.52-5.52M259.3,197.63v19.44c0,1.96.85,3.24,2.55,3.82"/>
+        <path class="cls-14" d="M259.3,198.48l5.52-5.52v23.26l-2.97,3.4c-1.7,0-2.55-.85-2.55-2.55v-18.59h0Z"/>
+        <path class="cls-34" d="M264.77,203.58c-1.96,2.55-2.12,5.1-.42,7.59"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_02_x5F_3_x5F_Pole_x5F_Wiggler">
+      <g id="Icon_x5F_01_x5F_Undulator_x5F_CPMU">
+        <path class="cls-34" d="M61.55,207.77h10.14M136.84,203.58l13.12-4.25M137.27,206.5l13.12-.42M137.27,209.05l12.69,3.4"/>
+        <path class="cls-29" d="M71.26,201.03l6.74-4.25h55.39v14.82l-4.67,3.82h-57.51v-14.39h.05Z"/>
+        <path class="cls-14" d="M71.26,201.03h57.51v14.39M128.77,201.03l4.67-4.25"/>
+        <path class="cls-8" d="M78.91,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M86.08,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M93.25,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M100.47,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M107.64,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M114.86,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M122.03,215.42v-14.39l5.89-4.25"/>
+        <path class="cls-8" d="M71.26,201.03l6.74-4.25M78.91,201.03l5.89-4.25"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_03_x5F_Front_x5F_End">
+      <g id="Icon_x5F_03_x5F_Front_x5F_End">
+        <path class="cls-33" d="M334.7,207.45h17.47"/>
+        <rect class="cls-30" x="351.75" y="185.04" width="56.87" height="42.11" rx="4.46" ry="4.46"/>
+        <path class="cls-13" d="M362.05,202.51l25.54-1.33v-8.97h8.07v29.52h-9.82v-12.11l-23.74-.42v-6.69h-.05Z"/>
+        <path class="cls-33" d="M403.2,207.45l22.83-5.36M403.2,207.45h22.83M403.2,207.45l22.83,5.84"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_04_x5F_Diagnostics">
+      <g id="Icon_x5F_04_x5F_Diagnostics">
+        <rect class="cls-29" x="502.82" y="191.52" width="33.83" height="32.87" rx="2.81" ry="2.81"/>
+        <circle class="cls-29" cx="519.76" cy="207.98" r="9.4"/>
+        <path class="cls-8" d="M519.76,191.52v-6.58M512.97,224.39v6.32h13.65v-6.32"/>
+        <rect class="cls-29" x="504.04" y="170.39" width="31.49" height="14.55" rx="1.17" ry="1.17"/>
+        <path class="cls-34" d="M507.76,178.83h4.46l2.81-4.46,3.08,6.8,3.08-4.46h10.09M489.23,207.98h21.13M529.16,207.98h21.13"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_05_x5F_MLM">
+      <g id="Icon_x5F_05_x5F_MLM">
+        <path class="cls-34" d="M597.35,211.17l89.64-16.51"/>
+        <path class="cls-29" d="M610.89,200.18l41.42-11.84c.58-.27,1.01,0,1.27.85l2.97,8.87c.27.58,0,1.01-.85,1.27l-41.42,11.42-3.4-10.57Z"/>
+        <path class="cls-29" d="M622.67,213.72l41.84-12.69,3.4,10.14c.27.58,0,1.01-.85,1.27l-41.42,10.99-2.97-9.72h0Z"/>
+        <path class="cls-34" d="M614.23,203.15l39.72-11.42M626.07,217.06l38.92-11.84"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_06_x5F_Filters">
+      <g id="Icon_x5F_06_x5F_Filters">
+        <path class="cls-32" d="M717.3,206.5h83.16"/>
+        <path class="cls-25" d="M735.99,196.14l6.37-5.95h3.98v27.45l-5.58,5.95h-4.78v-27.45Z"/>
+        <path class="cls-10" d="M735.99,196.14h4.78l5.58-5.95M740.77,196.14v27.45"/>
+        <path class="cls-25" d="M752.3,196.14l6.37-6.74h3.98v28.25l-5.58,5.95h-4.78v-27.45Z"/>
+        <path class="cls-10" d="M752.3,196.14h4.78l5.58-6.74M757.08,196.14v27.45"/>
+        <path class="cls-25" d="M768.65,196.14l6.37-7.54h3.98v29.05l-5.58,5.95h-4.78v-27.45Z"/>
+        <path class="cls-10" d="M768.65,196.14h4.78l5.58-7.54M773.43,196.14v27.45"/>
+        <path class="cls-32" d="M744.76,206.5h3.98M761.06,206.5h3.98M777.41,206.5h23.1"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_07_x5F_Micro_x5F_Tomo_x5F_Sample_x5F_Stage">
+      <g id="Icon_x5F_07_x5F_Micro_x5F_Tomo_x5F_Sample_x5F_Stage">
+        <path class="cls-26" d="M857.65,219.14v7.86c0,14.13,64.25,14.13,64.25,0v-7.86"/>
+        <ellipse class="cls-26" cx="889.78" cy="219.14" rx="32.13" ry="10.46"/>
+        <path class="cls-17" d="M877.51,179.47v37.07c0,6.27,24.53,6.27,24.53,0v-37.07"/>
+        <ellipse class="cls-26" cx="889.78" cy="179.2" rx="12.27" ry="4.46"/>
+        <path class="cls-12" d="M856.59,207.13c-8.87-6.8,0-11.47,12.53-13.59M865.46,191.47l3.66,2.07-3.66,3.13M922.91,207.13c8.87-6.8.53-12-12.53-13.59M914.05,190.94l-3.66,2.6,3.66,3.13"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_08_x5F_Detector_x5F_Gantry">
+      <g id="Icon_x5F_11_x5F_Micro_x5F_Tomo_x5F_Detector">
+        <path class="cls-23" d="M1441.35,192.11l61.39-6.8c6.27,0,9.4,3.56,9.4,10.73v16.89c0,6.27-3.03,9.51-9.08,9.72l-61.7-7.81v-22.73Z"/>
+        <ellipse class="cls-23" cx="1441.35" cy="203.47" rx="8.44" ry="11.36"/>
+        <ellipse class="cls-15" cx="1441.35" cy="203.47" rx="5.2" ry="7.81"/>
+        <path class="cls-11" d="M1455.95,190.51v26.29M1494.29,186.58v35.05"/>
+        <path class="cls-23" d="M1511.82,193.75l16.25,1.96v17.52l-16.25,3.24v-22.73Z"/>
+        <ellipse class="cls-23" cx="1528.06" cy="204.48" rx="5.52" ry="8.76"/>
+        <path class="cls-23" d="M1476.77,221.37v9.4h20.76v-9.72M1468.96,231.08h35.74v4.57h-35.74v-4.57Z"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_09_x5F_KB_x5F_Mirrors">
+      <g id="Icon_x5F_09_x5F_KB_x5F_Mirrors">
+        <path class="cls-31" d="M1158.58,190.51l46.52,13.12-46.52,15.35M1167.93,203.63h37.22"/>
+        <path class="cls-16" d="M1109.89,176.81c13.86,3.29,30.11,5.47,48.69,6.58v18.05c-17.15,1.81-33.4-.16-48.69-6v-18.59h0v-.05Z"/>
+        <path class="cls-9" d="M1109.89,176.81c14.23,5.47,30.48,8.55,48.69,9.29"/>
+        <path class="cls-16" d="M1109.89,217.86c16.04-5.1,32.29-7.49,48.69-7.12v15.88c-16.78,1.12-33.03,4.04-48.69,8.76v-17.52Z"/>
+        <circle class="cls-45" cx="1207.33" cy="203.63" r="2.76"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_10_x5F_Nano_x5F_Sample_x5F_Stage">
+      <g id="Icon_x5F_10_x5F_Nano_x5F_Sample_x5F_Stage">
+        <path class="cls-24" d="M1254.48,232.89l3.82-12.59h55.28l3.82,12.59v7.65h-62.93v-7.65Z"/>
+        <path class="cls-9" d="M1254.48,232.89h62.93"/>
+        <rect class="cls-24" x="1276.36" y="218.66" width="19.7" height="8.23" rx="1.65" ry="1.65"/>
+        <rect class="cls-16" x="1282.41" y="207.72" width="8.23" height="10.94" rx=".53" ry=".53"/>
+        <rect class="cls-24" x="1275.83" y="188.02" width="20.82" height="21.88" rx="1.12" ry="1.12"/>
+        <rect class="cls-16" x="1280.77" y="171.61" width="10.41" height="16.41"/>
+        <path class="cls-9" d="M1280.77,172.19c3.29,2.55,6.74,2.55,10.41,0"/>
+        <path class="cls-31" d="M1279.12,207.19c4.73-1.12,9.29-1.12,13.7,0"/>
+      </g>
+    </g>
+    <g id="Beamline_x5F_Component_x5F_11_x5F_Micro_x5F_Tomo_x5F_Detector">
+      <g id="Icon_x5F_08_x5F_Detector_x5F_Gantry">
+        <path class="cls-30" d="M979.89,238.09v-57.78c0-2.76,1.43-4.2,4.2-4.2h56.24c2.76,0,4.2,1.43,4.2,4.2v57.78h-6.64v-55.07h-51.35v55.07h-6.64Z"/>
+        <path class="cls-30" d="M975.43,238.09h15.56v3.93h-15.56v-3.93ZM1033.42,238.09h15.56v3.93h-15.56v-3.93Z"/>
+        <path class="cls-30" d="M1008.99,183.08v10.35h6.43v-10.35M1007.24,190.73h9.88v3.45h-9.88v-3.45Z"/>
+        <rect class="cls-30" x="1004.27" y="194.18" width="15.77" height="18.75" rx="1.27" ry="1.27"/>
+        <ellipse class="cls-30" cx="1012.18" cy="212.92" rx="7.91" ry="1.49"/>
+        <path class="cls-33" d="M1012.18,213.4v2.92"/>
+      </g>
+    </g>
+  </g>
+  <g id="Component_x5F_Labels">
+    <g class="cls-39">
+      <text class="cls-44" transform="translate(199.35 147.39)"><tspan x="0" y="0">R3</tspan><tspan class="cls-59" x="19.89" y="0"> </tspan><tspan x="23.93" y="0">TUNNE</tspan><tspan class="cls-62" x="77.52" y="0">L</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-44" transform="translate(590.87 147.39)"><tspan x="0" y="0">OPTICS HUTCH</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-44" transform="translate(1123 147.39)"><tspan x="0" y="0">EXPERIMEN</tspan><tspan class="cls-56" x="91.64" y="0">T</tspan><tspan class="cls-52" x="99.99" y="0">A</tspan><tspan class="cls-62" x="110.37" y="0">L</tspan><tspan x="118.45" y="0" xml:space="preserve"> HUTCH</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-44" transform="translate(853.93 28.5)"><tspan x="0" y="0">CONTRO</tspan><tspan class="cls-62" x="67.42" y="0">L</tspan><tspan x="75.49" y="0" xml:space="preserve"> ROOM</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-38" transform="translate(143.75 164.33)"><tspan x="0" y="0">SOURCES</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-38" transform="translate(343.36 164.33)"><tspan x="0" y="0">FRON</tspan><tspan class="cls-58" x="36.1" y="0">T</tspan><tspan x="43.66" y="0" xml:space="preserve"> END</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-38" transform="translate(554.76 164.33)"><tspan x="0" y="0">OPTICS</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-38" transform="translate(873.48 164.33)"><tspan x="0" y="0">µ-</tspan><tspan class="cls-58" x="11.59" y="0">T</tspan><tspan x="19.14" y="0">OMOGRAPH</tspan><tspan class="cls-58" x="94.91" y="0">Y</tspan><tspan class="cls-46" x="103.18" y="0" xml:space="preserve"> S</tspan><tspan class="cls-53" x="115.22" y="0">TA</tspan><tspan class="cls-51" x="129.61" y="0">TION</tspan></text>
+    </g>
+    <g class="cls-39">
+      <text class="cls-38" transform="translate(1219.54 164.33)"><tspan x="0" y="0">NANO-</tspan><tspan class="cls-58" x="41.06" y="0">T</tspan><tspan x="48.62" y="0">OMOGRAPH</tspan><tspan class="cls-60" x="124.38" y="0">Y</tspan><tspan x="132.65" y="0" xml:space="preserve"> S</tspan><tspan class="cls-53" x="144.69" y="0">TA</tspan><tspan x="159.09" y="0">TION</tspan></text>
+    </g>
+    <g id="Label_x5F_01_x5F_Undulator_x5F_CPMU">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(68.02 266.24)"><tspan x="0" y="0" xml:space="preserve">01  SOURCE</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(64.15 283.92)"><tspan x="0" y="0">CPMU</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(62.18 301.6)"><tspan x="0" y="0">Small, intense X-ray beam</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_02_x5F_3_x5F_Pole_x5F_Wiggler">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(204.55 266.24)"><tspan x="0" y="0" xml:space="preserve">02  SOURCE</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(190.74 283.92)"><tspan x="0" y="0">3-Pole Wiggler</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(206.89 301.6)"><tspan x="0" y="0">Wide X-ray beam</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_03_x5F_Front_x5F_End">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(332.74 266.24)"><tspan x="0" y="0" xml:space="preserve">03  FRON</tspan><tspan class="cls-60" x="57.36" y="0">T</tspan><tspan x="64.92" y="0" xml:space="preserve"> END</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(336.03 301.6)"><tspan x="0" y="0">Define and shape</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(341.71 317.16)"><tspan x="0" y="0">the X-ray beam</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_04_x5F_Diagnostics">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(512.7 266.24)"><tspan x="0" y="0">04</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(475.9 283.92)"><tspan x="0" y="0">DIAGNOSTICS</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(468.47 301.6)"><tspan x="0" y="0">Monitor X-ray beam.</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_05_x5F_MLM">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(617.36 266.24)"><tspan x="0" y="0" xml:space="preserve">05  MLM</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(611.31 301.6)"><tspan x="0" y="0">Select X-ray</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(624.85 317.16)"><tspan x="0" y="0">energy</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_06_x5F_Filters">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(722.56 266.24)"><tspan x="0" y="0" xml:space="preserve">06  FI</tspan><tspan class="cls-53" x="32.58" y="0">L</tspan><tspan x="38.73" y="0">TERS</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(719.53 301.6)"><tspan x="0" y="0">Attenuate X-ray</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(743.16 317.16)"><tspan x="0" y="0">beam.</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_07_x5F_Micro_x5F_Tomo_x5F_Sample_x5F_Stage">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(854.36 266.24)"><tspan x="0" y="0" xml:space="preserve">07  µ-</tspan><tspan class="cls-58" x="32.84" y="0">T</tspan><tspan x="40.4" y="0">OMO</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(841.03 283.92)"><tspan x="0" y="0">SAMPLE S</tspan><tspan class="cls-54" x="63.75" y="0">T</tspan><tspan x="70.59" y="0">AGE</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(843.84 301.6)"><tspan x="0" y="0">Rotate the sample</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_08_x5F_Detector_x5F_Gantry">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(981.7 266.24)"><tspan x="0" y="0" xml:space="preserve">08  DETEC</tspan><tspan class="cls-60" x="64.45" y="0">T</tspan><tspan x="72" y="0">OR</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(982.23 283.92)"><tspan x="0" y="0">GANT</tspan><tspan class="cls-58" x="35.4" y="0">RY</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(973.68 301.6)"><tspan x="0" y="0">Position the detector</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_09_x5F_KB_x5F_Mirrors">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(1107.66 266.24)"><tspan x="0" y="0" xml:space="preserve">09  KB MIRRORS</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(1125.29 301.6)"><tspan x="0" y="0">Focus X-rays</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_10_x5F_Nano_x5F_Sample_x5F_Stage">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(1256.93 266.24)"><tspan x="0" y="0" xml:space="preserve">10  NANO</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(1237.22 283.92)"><tspan x="0" y="0">SAMPLE S</tspan><tspan class="cls-54" x="63.75" y="0">T</tspan><tspan x="70.59" y="0">AGE</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(1238.76 301.6)"><tspan x="0" y="0">Position and rotate</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(1258.25 317.16)"><tspan x="0" y="0">the sample</tspan></text>
+      </g>
+    </g>
+    <g id="Label_x5F_11_x5F_Micro_x5F_Tomo_x5F_Detector">
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(1431.9 266.24)"><tspan class="cls-53" x="0" y="0">1</tspan><tspan x="6.14" y="0" xml:space="preserve">1  µ-</tspan><tspan class="cls-58" x="31.9" y="0">T</tspan><tspan x="39.45" y="0">OMO</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(1450.54 283.92)"><tspan x="0" y="0">DETEC</tspan><tspan class="cls-58" x="43.19" y="0">T</tspan><tspan x="50.75" y="0">OR</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-42" transform="translate(1425.36 301.6)"><tspan x="0" y="0">Collect projection data</tspan></text>
+      </g>
+    </g>
+    <g class="cls-39">
+      <text class="cls-37" transform="translate(1296.54 53.99)"><tspan x="0" y="0">Detector data</tspan></text>
+    </g>
+  </g>
+  <g id="Data_x5F_Analysis">
+    <g id="Component_x5F_12_x5F_Data_x5F_Analysis">
+      <g id="Icon_x5F_12_x5F_Data_x5F_Analysis">
+        <rect class="cls-22" x="755.16" y="61.74" width="39.3" height="24.85" rx="2.23" ry="2.23"/>
+        <rect class="cls-22" x="757.61" y="64.24" width="34.09" height="19.65"/>
+        <path class="cls-27" d="M771.04,86.59c.16,2.18-.42,3.29-1.75,3.5h10.67c-1.33-.16-1.91-1.33-1.75-3.5M767.32,90.1h14.66"/>
+        <path class="cls-20" d="M765.84,70.93l6.21-3.5,6.21,3.5v6.69l-6.21,3.72-6.21-3.5v-6.96h0v.05Z"/>
+        <path class="cls-27" d="M765.84,70.93l6.21,3.5,6.21-3.5M772.05,74.43v6.96M772.05,67.69v6.21"/>
+        <path class="cls-35" d="M782.99,68.7h5.47M782.99,72.15h5.47M782.99,75.65h5.47M782.99,79.16h5.47"/>
+      </g>
+      <g class="cls-39">
+        <text class="cls-36" transform="translate(744.65 119.89)"><tspan x="0" y="0" xml:space="preserve">12  D</tspan><tspan class="cls-55" x="27.92" y="0">AT</tspan><tspan class="cls-61" x="41.12" y="0">A </tspan><tspan class="cls-50" x="50.87" y="0">ANA</tspan><tspan class="cls-55" x="74.89" y="0">L</tspan><tspan x="80.52" y="0">YSIS</tspan></text>
+      </g>
+    </g>
+  </g>
+  <g id="Infrastructure">
+    <g id="Component_x5F_14_x5F_Infrastructure">
+      <g id="Icon_x5F_14_x5F_Infrastructure">
+        <path class="cls-28" d="M114.49,360.86h4.73c1.59,0,2.34.85,2.34,2.6v18.43c0,.8.48,1.17,1.43,1.17h7.06c.64,0,.96-.37.96-1.17v-14.87c0-1.59.85-2.34,2.6-2.34h13.7c1.27,0,1.91.64,1.91,1.91v4.94M114.49,362.78h4.25c.64,0,.96.37.96,1.17v18.43c0,1.91.96,2.81,2.81,2.81h8.5c1.43,0,2.12-.8,2.12-2.34v-15.13c0-.8.32-1.17.96-1.17h12.53c.48,0,.69.32.69.96v4.04"/>
+        <rect class="cls-21" x="111.14" y="358.74" width="3.77" height="8.5" rx="1.65" ry="1.65"/>
+        <rect class="cls-21" x="108.33" y="364.69" width="9.45" height="21.72" rx="2.81" ry="2.81"/>
+        <path class="cls-21" d="M142.79,370.32h8.55c1.29,0,2.34,1.05,2.34,2.34v10.2c0,1.29-1.05,2.34-2.34,2.34h-8.55c-1.29,0-2.34-1.05-2.34-2.34v-10.2c0-1.29,1.05-2.34,2.34-2.34Z"/>
+        <rect class="cls-21" x="144.97" y="367.02" width="4.73" height="1.65"/>
+        <rect class="cls-21" x="130.05" y="380.03" width="4.04" height="1.65"/>
+        <circle class="cls-21" cx="132.07" cy="374.62" r="3.88"/>
+        <path class="cls-28" d="M130.53,376l1.91-2.12"/>
+        <circle class="cls-45" cx="132.44" cy="373.87" r=".48"/>
+        <path class="cls-28" d="M147.09,373.66v8.5M143.54,375.79l7.06,4.25M143.54,380.03l7.06-4.25M145.87,374.14l1.17.69,1.17-.69M145.87,381.68l1.17-.69,1.17.69M143.75,374.62l.21,1.43,1.17.48M148.95,379.29l1.17.48.21,1.43M143.75,381.2l.21-1.43,1.17-.48M148.95,376.48l1.17-.48.21-1.43"/>
+      </g>
+      <g class="cls-39">
+        <text class="cls-40" transform="translate(178.74 368.09)"><tspan x="0" y="0" xml:space="preserve">14  INFRASTRUCTURE</tspan></text>
+      </g>
+    </g>
+  </g>
+  <g id="Lead_x5F_Hutches">
+    <g id="Component_x5F_13_x5F_Lead_x5F_Hutches">
+      <g id="Icon_x5F_13_x5F_Lead_x5F_Hutches">
+        <path class="cls-21" d="M681.62,366.55l18.21-6.64,23.84,3.08,2.81,1.65v16.78l-2.81,1.91-23.84,2.12-18.21-2.81v-16.09h0Z"/>
+        <path class="cls-19" d="M699.78,359.96v25.54M723.67,362.99v20.34M688.68,383.8v-9.93l5.42-.21v10.89"/>
+        <circle class="cls-63" cx="692.72" cy="379.08" r=".42"/>
+        <path class="cls-45" d="M707.11,373.4c0-2.07.8-3.61,2.34-4.73l1.65,3.08c-.64.32-.85.85-.69,1.65h-3.29Z"/>
+        <path class="cls-45" d="M713.48,371.75l1.91-3.08c1.59,1.43,2.28,3.08,2.12,4.94l-3.29-.21c.16-.64,0-1.17-.69-1.65h-.05Z"/>
+        <path class="cls-45" d="M711.36,374.83l-2.12,2.81c1.91,1.27,3.88,1.27,5.89,0l-1.91-2.81c-.64.48-1.27.48-1.91,0h.05Z"/>
+        <circle class="cls-45" cx="712.31" cy="373.4" r="1.12"/>
+      </g>
+      <g class="cls-39">
+        <text class="cls-40" transform="translate(751.82 364.58)"><tspan x="0" y="0" xml:space="preserve">13  LEAD HUTCHES</tspan></text>
+      </g>
+      <g class="cls-39">
+        <text class="cls-38" transform="translate(751.82 382.96)"><tspan x="0" y="0">Optics hutch + Experimental hutch</tspan></text>
+      </g>
+    </g>
+  </g>
+</svg></div></section><div class="controls"><button id="play" aria-label="Pause animation" title="Pause animation"></button><button id="replay" aria-label="Replay from start" title="Replay from start"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg></button><button id="sound" aria-label="Enable sound" title="Enable sound" aria-pressed="false"></button><input id="seek" aria-label="Animation time in seconds" type="range" min="0" max="15" step="0.01" value="0"><output id="time">0.00 / 15 s</output></div><p class="disclaimer">A simplified visualization of the TomoWISE beamline and its components, intended for educational and illustrative purposes only. Not to scale.</p></main><script>'use strict';
+// Refined from V2: original SVG is retained; effects are deterministic at any time.
+const $=s=>document.querySelector(s),svg=$('.art>svg'),NS='http://www.w3.org/2000/svg';
+const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,DURATION=15;
+const clamp=(x,a=0,b=1)=>Math.max(a,Math.min(b,x)),icon=n=>svg.querySelector(`[id^="Icon_x5F_${String(n).padStart(2,'0')}_"]`);
+function el(tag,attrs,parent=svg){const e=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);parent.appendChild(e);return e}
+const defs=svg.querySelector('defs'),mask=el('mask',{id:'v3-beam-reveal',maskUnits:'userSpaceOnUse',x:-20,y:-20,width:1720,height:440},defs),reveal=el('rect',{x:-10,y:-10,width:0,height:420,fill:'white'},mask);
+svg.querySelectorAll('.cls-6,.cls-5,.cls-31,.cls-32,.cls-33,.cls-34,.cls-35').forEach(e=>e.setAttribute('mask','url(#v3-beam-reveal)'));
+// Suppress decorative fan rays at the alternative sources and Front End.
+// The unmodified original master beam supplies one continuous trajectory.
+[1,2,3].forEach(n=>icon(n).querySelectorAll('.cls-34,.cls-33').forEach(e=>e.style.visibility='hidden'));
+const fx=el('g',{'pointer-events':'none','aria-hidden':'true',id:'v3-effects'});
+function copy(path,color,width,parent=fx){const e=path.cloneNode(false);['id','class','mask'].forEach(k=>e.removeAttribute(k));for(const[k,v]of Object.entries({fill:'none',stroke:color,'stroke-width':width,'stroke-linecap':'round','stroke-linejoin':'round'}))e.setAttribute(k,v);parent.appendChild(e);return e}
+const beam=svg.querySelector('.cls-6'),beamFX=copy(beam,'#ec83ad',4),beamLength=beam.getTotalLength(),data=svg.querySelector('.cls-4'),dataFX=copy(data,'#df719f',3),dataLength=data.getTotalLength();
+beamFX.style.filter='drop-shadow(0 0 3px #d889a6)';beamFX.setAttribute('stroke-linecap','butt');
+const pulse=el('circle',{r:3.5,fill:'#fff3f8',stroke:'#da6b9a','stroke-width':1.5},fx);
+const particles=Array.from({length:5},()=>el('circle',{r:3,fill:'#df719f'},fx));
+const ring=el('ellipse',{fill:'none',stroke:'#d889a6','stroke-width':1.4},fx);
+// Component 13: local-only halo, parented inside the exact small building icon.
+// No enclosure copies, full-scene overlays, or label effects are created.
+const leadIcon=svg.querySelector('#Icon_x5F_13_x5F_Lead_x5F_Hutches');
+const leadSilhouette=leadIcon.querySelector('path'),leadBounds=leadIcon.getBBox();
+const leadRegion={x:leadBounds.x-6,y:leadBounds.y-6,width:leadBounds.width+12,height:leadBounds.height+12};
+const leadBlur=el('filter',{id:'v31-local-lead-icon-blur',filterUnits:'userSpaceOnUse',...leadRegion,'color-interpolation-filters':'sRGB'},defs);
+el('feGaussianBlur',{stdDeviation:.9},leadBlur);
+const leadEffect=el('g',{'data-component':'13','data-layer':'local-lead-icon-halo','aria-hidden':'true','pointer-events':'none'},leadIcon);
+const leadIconGlow=copy(leadSilhouette,'#d889a6',6,leadEffect);leadIconGlow.setAttribute('filter','url(#v31-local-lead-icon-blur)');
+const leadIconOutline=copy(leadSilhouette,'#d889a6',4.4,leadEffect);
+// Original white body fill, green strokes and all details paint above the halo.
+leadIcon.insertBefore(leadEffect,leadIcon.firstChild);
+function renderLeadHutchIcon(playbackTime){
+ const clock=clamp(playbackTime,0,DURATION),breath=reduced?1:1+.1*Math.cos(2*Math.PI*clock/5);
+ leadIconGlow.style.opacity=.24*breath;
+ leadIconOutline.style.opacity=.55*breath;
+}
+// Initialize visibly at zero; use the same playback clock for pause, replay and scrubbing.
+renderLeadHutchIcon(0);
+
+const sparks=Array.from({length:3},()=>el('path',{d:'M-2.5 0H2.5M0 -2.5V2.5',fill:'none',stroke:'#d384a6','stroke-width':1.3},fx));
+const devices=Array.from({length:14},(_,i)=>icon(i+1)),boxes=devices.map(e=>e.getBBox());
+const poles=[...icon(2).querySelectorAll('.cls-29')],filters=[...icon(6).querySelectorAll('.cls-25')];
+const local=el('g',{},fx),sourceEmission=el('ellipse',{cx:148,cy:206.07,rx:5,ry:3,fill:'#f5bed7',stroke:'#cf719a','stroke-width':1},local);
+const aperture=el('g',{stroke:'#d17da0','stroke-width':2.4,'stroke-linecap':'round'},local),apertureTop=el('path',{d:'M382 193v9'},aperture),apertureBottom=el('path',{d:'M382 211v9'},aperture);
+const waveform=el('path',{d:'M507.76 178.83h4.46l2.81-4.46 3.08 6.8 3.08-4.46h10.09',fill:'none',stroke:'#df719f','stroke-width':2},local);
+const mirrorOverlay=el('g',{},local);icon(5).querySelectorAll('.cls-29').forEach(p=>copy(p,'#c97b9d',1.5,mirrorOverlay));
+const sampleClip=el('clipPath',{id:'v3-micro-sample-clip'},defs);el('rect',{x:877.51,y:179.47,width:24.53,height:38},sampleClip);
+const microStripe=el('path',{d:'',fill:'none',stroke:'#c97b9d','stroke-width':1.5,'clip-path':'url(#v3-micro-sample-clip)'},local);
+const microArc=el('ellipse',{cx:889.78,cy:197,rx:36,ry:9,fill:'none',stroke:'#d889a6','stroke-width':1.3,'stroke-dasharray':'7 12'},local);
+// Gantry frame stays fixed. Its small, already independent carriage paths can move safely.
+const gantry=icon(8),gantryParts=[...gantry.children].slice(2),carriage=el('g',{'data-v3':'gantry-carriage'},gantry);gantryParts.forEach(e=>carriage.appendChild(e));
+const focus=el('ellipse',{cx:1207.33,cy:203.63,rx:7,ry:7,fill:'none',stroke:'#d889a6','stroke-width':1.8},local);
+const nanoArc=el('ellipse',{cx:1286,cy:181,rx:13,ry:5,fill:'none',stroke:'#d889a6','stroke-width':1.3,'stroke-dasharray':'5 6'},local),nanoStripe=el('path',{d:'M1286 174v11',fill:'none',stroke:'#cf7b9c','stroke-width':1.1},local);
+const detectorPulse=el('ellipse',{cx:1441.35,cy:203.47,rx:10,ry:13,fill:'none',stroke:'#db80a5','stroke-width':1.5},local);
+// Illustrative support symbols, not a verified inventory or safety/interlock status.
+const utilities=el('g',{'data-layer':'illustrative-utilities'},fx);
+el('title',{},utilities).textContent='Illustrative technical-service symbols; not a verified equipment inventory';
+const utilityPaths=[
+ 'M0 -5V5M-4.33 -2.5 4.33 2.5M-4.33 2.5 4.33 -2.5M-1.5 -3.5 0 -2 1.5 -3.5M-1.5 3.5 0 2 1.5 3.5',
+ 'M1 -5 -3 1h3l-1 4 4-6H0Z',
+ 'M-4 3a5 5 0 1 1 8 0M0 0 2 -2M-2 5H2M0 3v2',
+ 'M-2 -5H2M-1 -5v2M1 -5v2M-3 -2q3-2 6 0v6q-3 2-6 0Z'
+];
+const utilityIcons=utilityPaths.map((d,i)=>{const g=el('g',{'data-utility':i,opacity:0},utilities);el('path',{d,fill:'none',stroke:'#176b45','stroke-width':1.15,'stroke-linecap':'round','stroke-linejoin':'round'},g);el('circle',{cx:5.5,cy:-4,r:.85,fill:'#d889a6',stroke:'none'},g);return g});
+function utilityState(time,i){
+ if(reduced)return{visible:i<2,opacity:i<2?.38:0,x:i===0?119:151,y:345,scale:1};
+ // 5-second periodic schedule divides the 15-second loop exactly, including pre-roll.
+ const age=((time-(.15+i*1.25))%5+5)%5,lifetime=2.05;
+ const opacity=age<lifetime?.48*clamp(age/.3)*clamp((lifetime-age)/.38):0;
+ const rise=clamp(age/.95),ease=rise*rise*(3-2*rise);
+ return{visible:opacity>0,opacity,x:119+i*12+(i%2?1:-1)*ease,y:351-16*ease,scale:.78+.22*clamp(age/.45)};
+}
+function workflowTime(time){return time<7?time:time<12?7+(time-7)*.8:time<14?11+(time-12)*.75:12.5;}
+const windows={1:[0,1.1],2:[0,1.1],3:[1.1,1.85],4:[1.85,2.55],5:[2.55,3.25],6:[3.25,4],7:[4,4.75],8:[4.75,5.5],9:[5.5,6.25],10:[6.25,7],11:[7,11],12:[11,12.5]};
+function stateAt(time){time=clamp(time,0,DURATION);const t=workflowTime(time),phase=time<4?0:time<7?1:time<12?2:3;
+ const current=phase===0?(t<1.1?1:t<1.85?3:t<2.55?4:t<3.25?5:6):phase===1?7+Math.min(3,Math.floor((t-4)/.75)):phase===2?11:12;
+ const x=t<=0?0:t<4?61.33+(800.46-61.33)*t/4:t<7?800.46+(1400-800.46)*(t-4)/3:t<7.25?1400+(1528.06-1400)*(t-7)/.25:1528.06;
+ const scan=clamp((t-7)/.22)*clamp((11-t)/.28),analysis=clamp((t-12.1)/.2),active=phase===3&&t<12.1?11:current;
+ return{t:time,workflowTime:t,phase,current,active,x,scan,analysis,scanProgress:clamp((t-7)/4)};}
+const stages=['Sources & beam conditioning','Experimental configurations','Projection acquisition','Data return & analysis'];
+function render(time){renderLeadHutchIcon(time);const t=workflowTime(time),s=stateAt(time),a=s.active,win=windows[a],u=clamp((t-win[0])/(win[1]-win[0])),w=reduced?0:Math.sin(t*9),wave=reduced?0:Math.sin(Math.PI*u),b=boxes[a-1];
+reveal.setAttribute('width',s.x?10+s.x:0);
+// Brightness belongs to the leading section, while completed original pink segments stay visible.
+const shown=Math.max(0,s.x-61.33),tail=Math.min(52,shown);beamFX.style.opacity=t>0&&t<7.35?(t<3.25?.85:.55):0;beamFX.setAttribute('stroke-dasharray',`0 ${Math.max(0,shown-tail)} ${tail} ${beamLength+30}`);
+const pt=beam.getPointAtLength(clamp(shown/beamLength)*beamLength);pulse.style.opacity=t>0&&t<7.25?.9:0;pulse.setAttribute('cx',pt.x);pulse.setAttribute('cy',pt.y);pulse.setAttribute('r',3.2+w*.35);
+devices.forEach((e,i)=>{const n=i+1;if(n>=13){e.style.filter='';return}const sourcePair=t<1.1&&(n===1||n===2),active=n===a||sourcePair,done=t>=windows[n][1];e.style.filter=active?`drop-shadow(0 0 ${4+w*.5}px ${sourcePair?'#8aba7b':'#e6a5c0'})`:done?'drop-shadow(0 0 1px #d8b5c8)':''});
+ring.setAttribute('cx',b.x+b.width/2);ring.setAttribute('cy',b.y+b.height/2);ring.setAttribute('rx',b.width/2+7+w*.5);ring.setAttribute('ry',b.height/2+7+w*.5);ring.style.opacity=t<1.1?0:.55+w*.1;
+// 01/02: neutral source emission and sequential magnetic-pole field pulses, not extra ray paths.
+sourceEmission.style.opacity=t>0&&t<1.1?.5+Math.abs(w)*.35:0;sourceEmission.setAttribute('rx',reduced?5:4+Math.abs(w)*2);
+poles.forEach((p,i)=>p.style.filter=t<1.1&&i===Math.min(2,Math.floor(t/1.1*3))?'drop-shadow(0 0 3px #76bd70)':'');
+// 03 aperture overlay closes/opens without moving the original Front End.
+aperture.style.opacity=a===3?.8:0;apertureTop.setAttribute('transform',`translate(0 ${wave*1.5})`);apertureBottom.setAttribute('transform',`translate(0 ${-wave*1.5})`);
+// 04 monitoring trace; 05 mirror highlight adjusts by less than one degree; 06 filter response.
+waveform.style.opacity=a===4?.8:0;waveform.setAttribute('stroke-dasharray',`${29*clamp((t-1.85)/.5)} 100`);
+mirrorOverlay.style.opacity=a===5?.75:0;mirrorOverlay.setAttribute('transform',`rotate(${wave*.65} 640 205)`);
+filters.forEach((p,i)=>p.style.filter=a===6&&i===Math.min(2,Math.floor(clamp((t-3.25)/.75)*3))?'drop-shadow(0 0 3px #d889a6)':'');
+// 07/10 surface cues show vertical-axis rotation with fixed cylinder silhouettes.
+const microActive=a===7;microStripe.style.opacity=microActive?.8:0;const sx=889.78+(reduced?0:Math.sin(u*Math.PI*2)*9);microStripe.setAttribute('d',`M${sx} 181 Q${sx+3} 198 ${sx} 216`);microArc.style.opacity=microActive?.6:0;microArc.setAttribute('stroke-dashoffset',reduced?0:-u*35);icon(7).querySelector('.cls-12').style.opacity=microActive?.6+.4*Math.abs(w):1;
+carriage.setAttribute('transform',`translate(${a===8?wave*1.3:0} 0)`);
+focus.style.opacity=a===9?.8:0;focus.setAttribute('rx',a===9?10-wave*5:7);focus.setAttribute('ry',a===9?10-wave*5:7);
+nanoArc.style.opacity=a===10?.7:0;nanoArc.setAttribute('stroke-dashoffset',reduced?0:-clamp((t-6.25)/.75)*22);nanoStripe.style.opacity=a===10?.7:0;nanoStripe.setAttribute('transform',`translate(${a===10&&!reduced?Math.sin(u*Math.PI*2)*3:0} 0)`);
+// 11 extended scanning HUD, with accumulating projections and reconstruction at its end.
+detectorPulse.style.opacity=t>=7&&t<11?.6+w*.2:0;detectorPulse.setAttribute('rx',10+(reduced?0:Math.abs(w)*3));detectorPulse.setAttribute('ry',13+(reduced?0:Math.abs(w)*3));
+$('#scanHUD').style.opacity=s.scan;$('#scanHUD').style.transform=`scale(${reduced?1:1-.06*(1-clamp((t-7)/.22))})`;
+$('#sample').setAttribute('transform',`translate(42 56) scale(${reduced?1:.7+.3*Math.cos((t-7)*3)} 1)`);$('#scanLine').setAttribute('transform',`translate(0 ${reduced?15:((Math.max(0,t-7)*18)%42)})`);$('#scanDot').style.opacity=.5+.5*Math.abs(w);
+[...$('#projections').children].forEach((e,i)=>e.style.opacity=clamp((t-7.2)*3-i*.55));
+[...$('#slices').children].forEach((e,i)=>e.style.opacity=clamp((t-8.35)*2-i*.7)*(1-clamp((t-10.15)*3)));
+$('#scanRecon').style.opacity=clamp((t-10.05)*3);$('#scanCaption').textContent=t>=10.15?'RECONSTRUCTION':t>=8.35?'PROJECTIONS / SLICES':'PROJECTIONS';
+// 12: the exact original dotted path has its start on the right and end by Control Room.
+const transferring=t>=11&&t<12.5;dataFX.style.opacity=transferring?.8:0;dataFX.setAttribute('stroke-dasharray','5 12');dataFX.setAttribute('stroke-dashoffset',reduced?0:-(t-11)*38);
+particles.forEach((e,i)=>{const z=(t-11)/1.1-i*.04,p=data.getPointAtLength(clamp(z)*dataLength);e.style.opacity=transferring&&z>=0&&z<=1?1:0;e.setAttribute('cx',p.x);e.setAttribute('cy',p.y)});
+$('#analysisHUD').style.opacity=s.analysis;[...$('#recon').children].forEach((e,i)=>e.style.opacity=clamp((t-12.1)*12-i*.4));
+ // Infrastructure equipment remains fixed; only illustrative floating symbols move.
+ utilityIcons.forEach((e,i)=>{const v=utilityState(time,i);e.style.opacity=v.opacity;e.setAttribute('transform',`translate(${v.x} ${v.y}) scale(${v.scale})`)});
+ // Keep V3's primary beam sparks, independently of the quiet support systems.
+ sparks.forEach((e,i)=>{const burst=t>0&&t<7.25&&!reduced,angle=i*Math.PI*2/3+t*.5,r=8+i*3;e.setAttribute('transform',`translate(${pt.x+Math.cos(angle)*r} ${pt.y+Math.sin(angle)*r})`);e.style.opacity=burst?.2+.2*Math.abs(Math.sin(t*6+i)):0});
+svg.classList.toggle('fx-complete',time>=14.6);$('#seek').value=time;$('#seek').style.setProperty('--progress',`${time/DURATION*100}%`);$('#seek').setAttribute('aria-valuetext',`${time.toFixed(2)} seconds, ${stages[s.phase]}`);$('#time').textContent=`${time.toFixed(2)} / 15 s`;return s}
+// Player and sound lifecycle retained from V2, with quieter laboratory-inspired cues.
+let running=false,t=0,last=performance.now(),sound=false,audio=null,voices=[],previous=0,audioRequest=0;
+const pauseIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14" stroke-width="4"/></svg>',playIcon='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 5 11 7-11 7Z" fill="currentColor" stroke="none"/></svg>';
+function buttons(){$('#play').innerHTML=running?pauseIcon:playIcon;$('#play').setAttribute('aria-label',running?'Pause animation':'Play animation');$('#play').title=running?'Pause animation':'Play animation';$('#sound').innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4Z"/>${sound?'<path d="M17 8q5 4 0 8"/>':'<path d="m17 9 5 6m0-6-5 6"/>'}</svg>`;$('#sound').setAttribute('aria-label',sound?'Mute sound':'Enable sound');$('#sound').title=sound?'Mute sound':'Enable sound';$('#sound').setAttribute('aria-pressed',String(sound));$('#sound').classList.toggle('sound-on',sound);$('#sound').insertAdjacentHTML('beforeend',`<span>Sound ${sound?'ON':'OFF'}</span>`)}
+function silence(){const old=voices;voices=[];old.forEach(o=>{try{o.stop()}catch{}})}
+function tone(f,d=.16,kind='resonance'){if(!sound||!audio||audio.state!=='running')return;const o=audio.createOscillator(),g=audio.createGain(),filter=audio.createBiquadFilter(),n=audio.currentTime;o.type=kind==='servo'?'triangle':'sine';o.frequency.setValueAtTime(f,n);o.frequency.linearRampToValueAtTime(f*(kind==='servo'?1.025:1.008),n+d);filter.type='lowpass';filter.frequency.setValueAtTime(kind==='hum'?280:1100,n);const volume=kind==='hum'?.032:kind==='servo'?.009:kind==='scan'?.012:.015;g.gain.setValueAtTime(.0001,n);g.gain.exponentialRampToValueAtTime(volume,n+Math.min(.06,d*.25));g.gain.exponentialRampToValueAtTime(.0001,n+d);o.connect(filter);filter.connect(g);g.connect(audio.destination);voices.push(o);o.onended=()=>{voices=voices.filter(x=>x!==o);o.disconnect();filter.disconnect();g.disconnect()};o.start(n);o.stop(n+d+.01)}
+const cues=[[.02,95,1.02,'hum'],[1.14,245,.22,'resonance'],[1.9,310,.2,'resonance'],[2.6,355,.24,'resonance'],[3.3,280,.18,'resonance'],[4.06,135,.5,'servo'],[4.8,155,.4,'servo'],[5.58,330,.18,'resonance'],[6.3,145,.45,'servo'],...Array.from({length:10},(_,i)=>[7.15+i*.35,390+(i%3)*18,.13,'scan']),...Array.from({length:5},(_,i)=>[11.05+i*.23,680+(i%2)*80,.11,'data']),[12.15,440,.2,'resonance'],[14.62,520,.26,'completion'],[14.83,650,.14,'completion']].map(([when,...rest])=>[when>=7&&when<11?7+(when-7)*1.25:when>=11&&when<12.5?12+(when-11)/.75:when,...rest]);
+function sounds(a,b){for(const[when,f,d,k]of cues)if(a<when&&b>=when)tone(f,d,k)}
+$('#play').onclick=async()=>{running=!running;last=performance.now();silence();if(running&&sound&&audio)await audio.resume();buttons()};
+$('#replay').onclick=()=>{silence();t=0;previous=0;running=true;last=performance.now();if(sound&&audio)audio.resume();render(t);buttons()};
+$('#seek').oninput=e=>{silence();t=clamp(+e.target.value,0,DURATION);previous=t;last=performance.now();render(t)};
+$('#sound').onclick=async()=>{const request=++audioRequest;if(sound){sound=false;silence();buttons();return}try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)throw Error('unavailable');audio=audio||new AC();await audio.resume();if(request!==audioRequest)return;sound=true;buttons()}catch{$('#sound').title='Audio is unavailable in this browser';$('#sound').setAttribute('aria-label','Audio unavailable')}};
+document.addEventListener('visibilitychange',()=>{last=performance.now();silence()});
+function tick(now){const dt=(now-last)/1000;last=now;if(running&&!document.hidden){let next=t+Math.max(0,Math.min(dt,.1));if(next>=DURATION){sounds(previous,DURATION);silence();next%=DURATION;previous=0;sounds(0,next)}else sounds(previous,next);t=next;previous=t;render(t)}requestAnimationFrame(tick)}
+window.TomoWISE={start({restart=true}={}){silence();if(restart){t=0;previous=0;}running=true;last=performance.now();render(t);buttons();},pause(){running=false;silence();buttons();},stateAt,utilityState,seek(v){silence();running=false;t=clamp(v,0,DURATION);previous=t;render(t);buttons()},getState(){return{...stateAt(t),running,sound,reduced}},duration:DURATION};buttons();render(0);svg.setAttribute('data-ready','true');requestAnimationFrame(tick);
+</script></body></html>
